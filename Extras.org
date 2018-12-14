@@ -1,0 +1,18 @@
+Extra 1)
+
+#+BEGIN_SRC java
+void test_and_set(boolean val){
+	if (val)
+		return;
+	else{
+		compare_and_swap(val,true);
+		return;	
+	}
+}
+#+END_SRC java
+
+Extra 2)
+
+Extra 3)
+
+O número de consenso do test-and-set é 2, já o número de consenso do compare-and-swap é infinito. Já de cara, percebemos que que tentar implementar CAS com TAS, não é possível que a solução não possua loops, pois precisamos de um while com o TAS em um lock.
