@@ -1,0 +1,17 @@
+95.3: 
+Nas classes do savingAccounts o método transfer é basicamente -> transfer : {saque, deposito},sendo que
+se o valor do saque(withdraw) for maior que o saldo atual o codigo vai dar um wait no saque, e só vai voltar quando tivermos um valor de saldo maior.
+
+
+Às 1h tenta-se fazer a transferência de 100, como nao sabemos o saldo de cada conta nao podemos afirmar ainda que a transferencia ocorreu (portanto vai esperar até ter termos um saldo maior que o saque), entretanto, às 2h, uma thread chefe deposita 1000 em cada conta que vai ser tirada (transferida), logo, vai dar para transferir 100 de todas as contas ( 1000 > 100 ), entao, sim, todas as threads retornam, porque de acordo com o código a rotina vai esperar até que o valor do saque seja maior e ai sim vai "fazer o saque" e a transferência.
+
+
+void transfer(int k, Account reserve) {
+	lock.lock();
+	try {
+		reserve.withdraw(k);
+		deposit(k);
+	}
+	finally{
+		lock.unlock();
+	}
