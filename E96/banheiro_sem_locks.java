@@ -41,6 +41,7 @@ public class banheiro_sem_locks{
    	public synchronized void leaveMale()
    	{
    		homens--;
+      change =  1;
 		  notifyAll();
    	}
    	 	
@@ -64,6 +65,7 @@ public class banheiro_sem_locks{
    	public synchronized void leaveFemale()
    	{
    		mulheres--;
+      change =  0;
       notifyAll();
    	}
 
