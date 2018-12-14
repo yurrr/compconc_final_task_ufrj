@@ -1,41 +1,46 @@
-public class savingsaccount_simple{
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-	static int saldo;
-	Lock lock1;
-	Condition condition;
+public class savingsaccount_simple {
+    static int saldo;
+    Lock lock1;
+    Condition condition;
 
- 	public savingsaccount_simple(int k) {
-   		saldo = k;
-		lock1 = new ReentrantLock();
-   		condition = lock.newCondition();
-  	}
+    public savingsaccount_simple(int k) {
+        saldo = k;
+        lock1 = new ReentrantLock();
+        condition = lock1.newCondition();
+    }
 
 
-	void saque(int val_saque)
-	{
-		lock1.lock();
-		try{
-			while( val_saque < saldo ){
-				condition.await();
-			}
-			saldo = saldo - val_saque;
-			// condition tbm pode ser com notifyAll acredito
-			condition.signalAll();
-		}finally{
-			lock1.unlock();
-		}
+    void saque(int val_saque)
+    {
+        lock1.lock();
+        try {
+            while (val_saque < saldo) {
+                condition.await();
+            }
+            saldo = saldo - val_saque;
+            // condition tbm pode ser com notifyAll acredito
+            condition.signalAll();
+        } catch (Exception e) {
 
-	}
-	void deposito(int val_deposito)
-	{
-		lock1.lock();
-		try{
-			saldo += val_deposito;	
-		}catch(Exception e){
-			// ver se isso aqui esta certo
-         	System.out.println("Exception occurred," + e);
-		}finally{
-			lock1.unlock();
-		}
-	}
+        } finally {
+            lock1.unlock();
+        }
+
+    }
+    void deposito(int val_deposito)
+    {
+        lock1.lock();
+        try {
+            saldo += val_deposito;
+        } catch (Exception e){
+            // ver se isso aqui esta certo
+            System.out.println("Exception occurred," + e);
+        }finally{
+            lock1.unlock();
+        }
+    }
 }
