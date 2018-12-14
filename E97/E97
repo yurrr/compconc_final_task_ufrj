@@ -1,98 +1,92 @@
-import java.io.*; 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.LinkedList; 
+import java.util.LinkedList;
 // so uma thread por vez
 // https://www.tutorialspoint.com/java/lang/thread_getid.htm
- 
- public class Rooms {
- 	static int rooms;
- 	static int threads_na_sala;
- 	static int room_atualmente_ocupada;
- 	// static int num_room_ocupada;
- 	static Thread t;
- 	static boolean removed = false;
- 	//fila de threads aguardam a entrada
- 	LinkedList[] fila_threads2;
 
-	Rooms.Handler[] handler;
- 	public interface Handler{
+public class Rooms {
+    static int rooms;
+    static int threads_na_sala;
+    static int room_atualmente_ocupada;
+    // static int num_room_ocupada;
+    static Thread t;
+    static boolean removed = false;
+    //fila de threads aguardam a entrada
+    LinkedList<Thread> fila_threads2;
 
- 		void onEmpty();
- 	}
- 	
- 	public Rooms(int m)
- 	{ 
- 		rooms = m;
- 		threads_na_sala  = 0;
-		room_atualmente_ocupada = -1; // sala sendo usad/ocupada, nenhuma sala ocupada ainda
-		handler 	  = new Rooms.Handler[m];
- 	 	fila_threads2 = new LinkedList();
- 	};
+    Rooms.Handler[] handler;
+    public interface Handler{
 
- 	// i eh a room/sala que a thread vai entrar
- 	public synchronized void enter(int sala)
- 	{ 	
-  		// http://tutorials.jenkov.com/java-concurrency/synchronized.html#synchronized-blocks-instance-methods
- 		// se a room i estiver vazia eu entro ver se já nao tem gente esperando,
- 		// se tiver eu coloco a thread que quer entrar na fila  
- 		// pega o id da thread atual
- 		t = Thread.currentThread().getId();
+        void onEmpty();
+    }
 
- 		synchronized(this){
- 			if(fila_threads2.isEmpty() && threads_na_sala == 0){
- 				room_atualmente_ocupada = sala;
- 				threads_na_sala  = 1;
- 			}else{
- 				fila_threads2.add(t);
- 			}
- 		}
- 		//https://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Thread.State.html
- 		while(t.getState() == "WAITING" && !removed ){};
- 		// 
- 	}
- 	// The last thread to leave a room calls the room’s exit handler, and no
-	// threads are in any room while that handler is running.
- 	public synchronized boolean exit()
- 	{
- 		threads_na_sala--;
- 		if ( threads_na_sala == 0 ){
- 			// quando cada thread3
- 			// chamar o Handler
- 			if (handler[activeRoom] != null) 
-				handler[activeRoom].onEmpty();
+    public Rooms(int m)
+    {
+        rooms = m;
+        threads_na_sala  = 0;
+        room_atualmente_ocupada = -1; // sala sendo usad/ocupada, nenhuma sala ocupada ainda
+        handler 	  = new Rooms.Handler[m];
+        fila_threads2 = new LinkedList<Thread>();
+    };
 
-			// mover pro proximo da fila, caso exista
-			if( !fila_threads2.isEmpty() ){
-				t = fila_threads2.get();
- 				fila_threads2.remove(); 
- 				removed	= true;  // garante que a thread foi excluida
-	 			room_atualmente_ocupada = room;
+    // i eh a room/sala que a thread vai entrar
+    public synchronized void enter(int sala)
+    {
+        // http://tutorials.jenkov.com/java-concurrency/synchronized.html#synchronized-blocks-instance-methods
+        // se a room i estiver vazia eu entro ver se já nao tem gente esperando,
+        // se tiver eu coloco a thread que quer entrar na fila
+        // pega o id da thread atual
+        t = Thread.currentThread();
 
- 				LinkedList[] fila_threads2_tmp = new LinkedList();
- 				while (!fila_threads2_tmp.isEmpty()) {
- 					t = fila_threads2_tmp.get();
- 					fila_threads2_tmp.remove(); 
+        synchronized(this){
+            if(fila_threads2.isEmpty() && threads_na_sala == 0){
+                room_atualmente_ocupada = sala;
+                threads_na_sala  = 1;
+            }else{
+                fila_threads2.add(t);
+            }
+        }
+        //https://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Thread.State.html
+        while(t.getState().equals("WAITING") && !removed ){}
+        //
+    }
+    // The last thread to leave a room calls the room’s exit handler, and no
+    // threads are in any room while that handler is running.
+    public synchronized boolean exit()
+    {
+        threads_na_sala--;
+        if ( threads_na_sala == 0 ){
+            // quando cada thread3
+            // chamar o Handler
+            if (handler[room_atualmente_ocupada] != null)
+                handler[room_atualmente_ocupada].onEmpty();
 
- 					if (info .room == num_room_ocupada)
- 						removed	= true; //tira ela dos wait
- 					else{
- 						fila_threads2_tmp.add(t.getId());
- 					}
- 				}
-				fila_threads = fila_threads2_tmp;
-			}
-			return true;
-		} 
-		return false;
- 	}
- 	
+            // mover pro proximo da fila, caso exista
+            if( !fila_threads2.isEmpty() ){
+                t = fila_threads2.getFirst();
+                fila_threads2.remove();
+                removed	= true;  // garante que a thread foi excluida
+                room_atualmente_ocupada = rooms;
 
- 	public void setExitHandler(int i, Rooms.Handler h)
- 	{
- 		handler[i] = h;
- 	};
- }
+                LinkedList<Thread> fila_threads2_tmp = new LinkedList();
+                while (!fila_threads2_tmp.isEmpty()) {
+                    t = fila_threads2_tmp.getFirst();
+                    fila_threads2_tmp.remove();
+
+                    if (rooms == room_atualmente_ocupada)
+                        removed	= true; //tira ela dos wait
+                    else{
+                        fila_threads2_tmp.add(t);
+                    }
+                }
+                fila_threads2 = fila_threads2_tmp;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+    public void setExitHandler(int i, Rooms.Handler h)
+    {
+        handler[i] = h;
+    };
+}
