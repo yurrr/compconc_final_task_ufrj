@@ -1,0 +1,1 @@
+No código com problema, na classe do Guarda. Quando o guarda sorteia o prisioneiro, ele não espera a Thread do prisioneiro estar rodando. Por conta disso, quando chama p.gotoRoom() essa solicitação se perde e o programa entra em um estado de deadlock.
