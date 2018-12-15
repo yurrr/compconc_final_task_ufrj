@@ -25,6 +25,26 @@ function tasWCXchg(int valor){
 #+END_SRC java
 
 Extra 2)
+#+BEGIN_SRC java
+//pseudocodigo retirado da wikipedia do compare and exchange : 
+//https://en.wikipedia.org/wiki/Compare-and-swap
+function cas(p : pointer to int, old : int, new : int) returns bool {
+ 	// tas sempre troca valores
+ 	// tas retorna o valor antigo
+ 	// cas so troca se forem iguais 
+    if *p ≠ old {
+        return false
+    }
+    // retorna sempre true, uma vez que sao iguais
+    // depois faz a alteracao do valor, onde 
+    // p = new
+    // e o ou logico ( || ) sempre vai retornar true
+    // return  true || false
+    tasval <- tas(p,new)
+    return tasval || !tasval
+}
+#+END_SRC java
+
 
 Extra 3)
 
