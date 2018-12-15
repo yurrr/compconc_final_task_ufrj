@@ -27,7 +27,6 @@ public class Rooms {
         fila_threads2 = new LinkedList<Thread>();
     };
 
-    // i eh a room/sala que a thread vai entrar
     public synchronized void enter(int sala)
     {
         // http://tutorials.jenkov.com/java-concurrency/synchronized.html#synchronized-blocks-instance-methods
