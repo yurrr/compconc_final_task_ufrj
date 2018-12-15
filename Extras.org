@@ -1,14 +1,27 @@
 Extra 1)
 
 #+BEGIN_SRC java
-void test_and_set(boolean val){
-	if (val)
-		return;
-	else{
-		compare_and_swap(val,true);
-		return;	
-	}
+//pseudocodigo retirado da wikipedia do compare and exchange : 
+//https://en.wikipedia.org/wiki/Compare-and-swap
+function cas(p : pointer to int, old : int, new : int) returns bool {
+    if *p ≠ old {
+        return false
+    }
+    *p ← new
+    return true
 }
+
+// tas with compare exchange
+int true = 1; int false = 0;
+function tasWCXchg(int valor){
+	// como o tas retorna o valor antigo
+	// precisamos negar o cas ( que retorna true se forem iguais)
+	// como exemplo, se o valor de valor for false o nosso cas retornaria 
+	// true, o que nao é o novo valor e sim o valor já mudado.
+	// entao, o valor antigo é só negarmos;
+	return !cas(valor,false,true);
+}
+
 #+END_SRC java
 
 Extra 2)
